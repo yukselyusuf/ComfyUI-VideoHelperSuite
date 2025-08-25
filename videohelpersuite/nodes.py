@@ -626,6 +626,7 @@ class LoadAudio:
         return {
             "required": {
                 "audio_file": ("STRING", {"default": "input/", "vhs_path_extensions": ['wav','mp3','ogg','m4a','flac']}),
+                "isExecute": ("BOOLEAN", {"default": True}),
                 },
             "optional" : {"seek_seconds": ("FLOAT", {"default": 0, "min": 0}),
                           "duration": ("FLOAT" , {"default": 0, "min": 0, "max": 10000000, "step": 0.01}),
@@ -636,7 +637,10 @@ class LoadAudio:
     RETURN_NAMES = ("audio",)
     CATEGORY = "Video Helper Suite 🎥🅥🅗🅢/audio"
     FUNCTION = "load_audio"
-    def load_audio(self, audio_file, seek_seconds, duration):
+    def load_audio(self, audio_file, isExecute, seek_seconds, duration):
+        if not isExecute:
+            return (None,)
+            
         audio_file = strip_path(audio_file)
         if audio_file is None or validate_path(audio_file) != True:
             raise Exception("audio_file is not a valid path: " + audio_file)
@@ -647,7 +651,9 @@ class LoadAudio:
         return (get_audio(audio_file, start_time=seek_seconds, duration=duration),)
 
     @classmethod
-    def IS_CHANGED(s, audio_file, seek_seconds):
+    def IS_CHANGED(s, audio_file, isExecute, seek_seconds):
+        if not isExecute:
+            return ""
         return hash_path(audio_file)
 
     @classmethod
